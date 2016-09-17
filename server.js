@@ -1,10 +1,14 @@
 var express = require('express');
+var fs = require('fs');
 var app = express();
 var querystring = require('querystring')
 var rmp = require('rmp-api');
+var bodyparser = require("body-parser");
+
 
 /************* VARIABLES ****************/
 
+var course = ""
 
 /****************************************/
 
@@ -27,11 +31,27 @@ function paren(str){
 }
 
 function find_professor(name){
-
-}
-
-function parse_data(raw_data, course){
+  professor = rmp.get(name, parse_data)
+  if (professor === null) {
+    console.log("No professor found.");
+    return;
+  }
   
+};
+
+function parse_data(professor){
+  console.log(course);
+  console.log(professor);
+  
+	/*console.log("Name: " + professor.fname + " " + professor.lname);
+  console.log("University: "+ professor.university);
+  console.log("Quality: " + professor.quality);
+  console.log("Easiness: " + professor.easiness);
+  console.log("Helpfulness: " + professor.help);
+  console.log("Average Grade: " + professor.grade);
+  console.log("Chili: " + professor.chili);
+  console.log("URL: " + professor.url);
+  console.log("First comment: " + professor.comments[0]);*/ 
 }
 
 /*****************************************************************************/
@@ -43,9 +63,10 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 
 app.get('/search', function(req, res){
-  var data = find_professor(req.query.name)
-  console.log("finding prof: "+req.query.name)
-  var desc = parse_data(data, req.query.course)
+  console.log(req.query)
+  console.log(req.query.course)
+  course = req.query.course
+  find_professor(req.query.name)
 })
 
 app.use('/', function(req, res, next) {
@@ -56,6 +77,6 @@ app.use('/', function(req, res, next) {
   });
 });
 
-app.listen('8081'); 
+app.listen('8080'); 
 
 /*****************************************************************************/
