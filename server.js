@@ -4,6 +4,12 @@ var app = express();
 var querystring = require('querystring')
 var rmp = require('rmp-api');
 var bodyparser = require("body-parser");
+var csv = require("fast-csv");
+var streampos = fs.createReadStream("positive.csv");
+var streamneg = fs.createReadStream("negative.csv");
+var common = require('common-words');
+
+
 
 
 /************* VARIABLES ****************/
@@ -55,6 +61,39 @@ var negative = []
 
 /************ FUNCTIONS ****************/
 
+var posCSVStream = csv()
+    .on("data", function(data){
+        positive.push(data);
+    })
+    .on("end", function(){
+         console.log("done");
+    });
+
+streampos.pipe(posCSVStream);
+
+//stream in words with negative connotation
+var negCSVStream = csv()
+    .on("data", function(data){
+        negative.push;
+    })
+    .on("end", function(){
+         console.log("done");
+    });
+
+streamneg.pipe(negCSVStream);
+
+//remove common words
+function removeCommonWords(words, common) {
+  common.forEach(function(obj) {
+    var word = obj.word;
+    while (words.indexOf(word) !== -1) {
+      words.splice(words.indexOf(word), 1);
+    }
+  });
+  return words;
+};
+removeCommonWords(yourWords, common);
+
 // Extracts string from inside next parenthesis it encounters
 function paren(str){
   var p = false
@@ -70,28 +109,17 @@ function paren(str){
   return new_str
 }
 
-function find_professor(name){
-  professor = rmp.get(name, parse_data)
+function find_professor(name, res){
   if (professor === null) {
     console.log("No professor found.");
     return;
-  }
-  
+  } 
+  rmp.get(name, parse_data)
 };
 
 function parse_data(data){
-	//quality: '2.9',
-  //easiness: '3.1',
-  //help: '3.1',
-  //clarity: '3.1',
-  //topTag: 'Tough Grader (9)',
-  //grade: '3.1'
-  //tags
-  //comments
-  //courses
-  //course_ratings
 	//16credits*3hours*15weeks
-	var hours = 720
+	var hours = 180
   if(data.courses.indexOf(course) < 0){
 		return -1;
 	}
@@ -114,10 +142,25 @@ function parse_data(data){
 	for(comment in data.comments{
 		hours *= (parseComment(comment)*weight.comment)
 	)
+
+	console.log(hours)
+	res.redirect('/results?hours='+hours)
 }
 
 function parseComments(comments){
-	
+	var effect = 1.000;
+	for(comment in comments){
+		removeCommonWords(comment)
+		for(word in comment){
+			if(positive.indexOf(word) > -1){
+				effect *= 1..01
+			}
+			else if(negative.indexOf(word) > -1){
+				effect *=.99
+			}
+		}
+	}
+	return effect;
 }
 
 /*****************************************************************************/
@@ -129,19 +172,23 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 
 app.get('/search', function(req, res){
-  console.log(req.query)
-  console.log(req.query.course)
   course = req.query.course
-  find_professor(req.query.name)
+  find_professor(req.query.name, res)
 })
 
-app.use('/', function(req, res, next) {
+app.use('/', function(req, res) {
   fs.readFile('index.html',function (err, data){
     res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
     res.write(data);
     res.end();
-  });
-});
+  })
+})
+
+app.use('/results', function(req, res) {
+	res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
+  res.write(hours);
+  res.end();
+})
 
 app.listen('8080'); 
 
