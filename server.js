@@ -43,7 +43,7 @@ var bareTags = [
   "SKIP CLASS? YOU WON'T PASS.",
   "BEWARE OF POP QUIZZES",
   "INSPIRATIONAL",
-  "ACCESSIBLE OUTSIDE OF CLASS",
+  "ACCESSIBLE OUTSIDE CLASS",
   "SO MANY PAPERS",
   "HILARIOUS",
   "GRADED BY FEW THINGS",
@@ -66,7 +66,7 @@ var tags = {
   "SKIP CLASS? YOU WON'T PASS.": 1.05,
   "BEWARE OF POP QUIZZES":1,
   "INSPIRATIONAL": 1,
-  "ACCESSIBLE OUTSIDE OF CLASS":1,
+  "ACCESSIBLE OUTSIDE CLASS":1,
   "SO MANY PAPERS": 1.05,
   "HILARIOUS":1,
   "GRADED BY FEW THINGS":1,
@@ -89,7 +89,7 @@ var tips = {
   "SKIP CLASS? YOU WON'T PASS.": "Do not skip class",
   "BEWARE OF POP QUIZZES":"Beware of pop quizzes",
   "INSPIRATIONAL": "Professor is Inspirational",
-  "ACCESSIBLE OUTSIDE OF CLASS": "Professor is availablle outside of class",
+  "ACCESSIBLE OUTSIDE CLASS": "Professor is availablle outside of class",
   "SO MANY PAPERS": "There will be a lot of papers",
   "HILARIOUS":"Professor is Hilarious",
   "GRADED BY FEW THINGS":"Grades are based off very few assignments",
@@ -112,7 +112,7 @@ var popular = {
   "SKIP CLASS? YOU WON'T PASS.": 0,
   "BEWARE OF POP QUIZZES":0,
   "INSPIRATIONAL": 0,
-  "ACCESSIBLE OUTSIDE OF CLASS":0,
+  "ACCESSIBLE OUTSIDE CLASS":0,
   "SO MANY PAPERS": 0,
   "HILARIOUS":0,
   "GRADED BY FEW THINGS":0,
@@ -201,7 +201,6 @@ function find_professor(name, course, cb){
 
 function parseData(data, course){
   var hours = 180
-  console.log(data)
   if(data === null || data.courses.indexOf(course) < 0){
     return -1;
   }
