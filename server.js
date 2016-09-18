@@ -190,6 +190,18 @@ function paren(str){
 function find_professor(name, course, cb){
   console.log(name)
   console.log(course)
+  name = name.split(" ")
+  name = name[0][0].toUpperCase()+name[0].substring(1).toLowerCase()+" "+name[1][0].toUpperCase()+name[1].substring(1).toLowerCase()
+
+  for(var i = 0; i < course.length; i++){
+		if (course[i] < '0' || course[i] > '9') {
+      console.log(course[i])
+    	course = course.substring(0, i)+course.charAt(i).toUpperCase()+course.substring(i+1)
+		} 
+  }
+
+	console.log(course)
+
   if (name === null || course === null) {
     console.log("No professor found.");
     return
@@ -311,8 +323,11 @@ app.use(bodyparser.json());
 
 app.get('/search', function(req, res){
   console.log(req.query.name+" "+req.query.course+" "+req.query.grade)
+
   find_professor(req.query.name, req.query.course, function(data) {
+
     fs.readFile('result.html','utf8', function (err, page){
+
       res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
       if(data < 0 || description.length < 0){
         page = page.replace(/hour_result/g, "N/A")
@@ -329,6 +344,7 @@ app.get('/search', function(req, res){
       res.end();
     })
   })
+  description = []
 })
 
 app.use('/', function(req, res) {
