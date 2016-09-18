@@ -194,24 +194,26 @@ function paren(str){
 function find_professor(name, course, cb){
   console.log(name)
   console.log(course)
-  name = name.split(" ")
+  name = name.trim().split(" ")
   name = name[0][0].toUpperCase()+name[0].substring(1).toLowerCase()+" "+name[1][0].toUpperCase()+name[1].substring(1).toLowerCase()
 
   for(var i = 0; i < course.length; i++){
-		if (course[i] < '0' || course[i] > '9') {
+    if (course[i] < '0' || course[i] > '9') {
       console.log(course[i])
       course = course.substring(0, i)+course.charAt(i).toUpperCase()+course.substring(i+1)
-		} 
+    }
   }
-
-	console.log(course)
+  console.log(course)
 
   if (name === null || course === null) {
     console.log("No professor found.");
     return
   }
+
+  getDescription(course)
+
   rmp.get(name, function(data) {
-    cb(parseData(data, course));
+    cb(parseData(data, course, courseDescription));
   })
 }
 
@@ -238,10 +240,6 @@ function parseData(data, course){
   data.tags.forEach(function(tag){
     console.log(tag)
     popular[tag]++
-    /*if(tag.indexOf("'") > -1){
-      tag = "SKIP CLASS? YOU WON'T PASS."
-      console.log("changed "+ tags["SKIP CLASS? YOU WON'T PASS."])
-    }*/
     console.log(tags[tag])
     hours = applyWeight(hours, tags[tag], weight.tag)
   })
@@ -283,37 +281,36 @@ function parseData(data, course){
     hours = applyWeight(hours, parseComment(comment), weight.comment)
     //console.log("hours "+hours)
   })
- 
-  getDescription(course)
+
   //console.log(hours)
   return hours/15;
 }
 
 function getDescription(crs){
-	request('https://classes.cornell.edu/api/2.0/search/classes.json?roster=FA14&subject='+letters(crs)+'&acadCareer[]=UG&classLevels[]='+level(crs), function (error, response, body) {
+  request('https://classes.cornell.edu/api/2.0/search/classes.json?roster=FA14&subject='+letters(crs)+'&acadCareer[]=UG&classLevels[]='+level(crs), function (error, response, body) {
     console.log("\n\n\nhttps://classes.cornell.edu/api/2.0/search/classes.json?roster=FA14&subject="+letters(crs)+"&acadCareer[]=GR&classLevels[]="+level(crs)+"\n\n\n")
-		if (!error && response.statusCode == 200) {
-			var json = JSON.parse(body)
-			for(var i = 0; i < json.data.classes.length; i++){
-				if(json.data.classes[i].catalogNbr == numbers(crs)){
+    if (!error && response.statusCode == 200) {
+      var json = JSON.parse(body)
+      for(var i = 0; i < json.data.classes.length; i++){
+        if(json.data.classes[i].catalogNbr == numbers(crs)){
           console.log("getting description "+json.data.classes[i].description)
-					courseDescription = json.data.classes[i].description
-				}
-			}
-		}
-	})  
+          courseDescription = json.data.classes[i].description
+        }
+      }
+    }
   return
+  })
 }
 
 function numbers(crs){
-	var ret = ""
- for(var i = 0; i < crs.length; i++){
-		if (crs[i] >= '0' && crs[i] <= '9') {
+  var ret = ""
+  for(var i = 0; i < crs.length; i++){
+    if (crs[i] >= '0' && crs[i] <= '9') {
       console.log(crs[i])
-			ret+=crs[i]
-		} 
-  } 
-	return ret
+      ret+=crs[i]
+    }
+  }
+  return ret
 }
 
 function student(crs){
@@ -328,26 +325,26 @@ function student(crs){
 }
 
 function letters(crs){
-	var ret = ""
-	for(var i = 0; i < crs.length; i++){
-		if (crs[i] < '0' || crs[i] > '9') {
+  var ret = ""
+  for(var i = 0; i < crs.length; i++){
+    if (crs[i] < '0' || crs[i] > '9') {
       console.log(crs[i])
       ret+=crs[i]
-		} 
+    }
   }
   return ret
 }
 
 function level(crs){
-	var ret = ""
- for(var i = 0; i < crs.length; i++){
-		if(crs[i] >= '0' && crs[i] <= '9') {
+  var ret = ""
+  for(var i = 0; i < crs.length; i++){
+    if(crs[i] >= '0' && crs[i] <= '9') {
       console.log("L"+crs[i])
-			ret+=crs[i]+'0'+'0'+'0'
-			break
-		} 
-  } 
-	return ret
+      ret+=crs[i]+'0'+'0'+'0'
+      break
+    }
+  }
+  return ret
 }
 
 function parseComment(comment){
@@ -391,7 +388,7 @@ app.get('/search', function(req, res){
   console.log(req.query.name+" "+req.query.course+" "+req.query.grade)
   find_professor(req.query.name, req.query.course, function(data) {
 
-    fs.readFile('result.html','utf8', function (err, page){
+    fs.readFile('result.html','utf8', courseDescription, function (err, page){
 
       res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
       if(data < 0 || description.length < 0){
@@ -411,12 +408,12 @@ app.get('/search', function(req, res){
       else{
         page = page.replace(/course_description/g, "There is no available information on that course")
       }
-      console.log("cd "+courseDescription)
       res.write(page);
       res.end();
     })
   })
   description = []
+  //courseDescription = -1
 })
 
 app.use('/', function(req, res) {
