@@ -190,7 +190,7 @@ function paren(str){
 function find_professor(name, course, cb){
   console.log(name)
   console.log(course)
-  if (name === null) {
+  if (name === null || course === null) {
     console.log("No professor found.");
     return
   }
@@ -201,8 +201,8 @@ function find_professor(name, course, cb){
 
 function parseData(data, course){
   var hours = 180
-  console.log(hours)
-  if(data.courses.indexOf(course) < 0){
+  console.log(data)
+  if(data === null || data.courses.indexOf(course) < 0){
     return -1;
   }
   var powerTag = data.topTag.split('(')[0]
@@ -243,11 +243,24 @@ function parseData(data, course){
     hours = applyWeight(hours, ratings[rating], weight.rating)
   })
 
-  for(var i = 0; i < 20; i++){
-    console.log("# "+popular[bareTags[i]])
-    if(popular[bareTags[i]] > 1){
-      description+="* "+tips[bareTags[i]]+"<br>"
+  var indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+
+  for(var i = 0; i < 19; i++){
+    if(popular[bareTags[i]] > popular[bareTags[i+1]]){
+      var temp = indexArray[i]
+      indexArray[i] = indexArray[i+1]
+      indexArray[i+1] = temp
     }
+  }
+  console.log("arr "+indexArray)
+
+  for(var i = 0; i < 20; i++){
+    console.log("pop "+popular[bareTags[indexArray[i]]])
+  }
+
+  for(var i = 17; i < 20; i++){
+    console.log("# "+popular[bareTags[indexArray[i]]])
+    description+="* "+tips[bareTags[indexArray[i]]]+"<br>"
   }
 
   console.log(hours)
@@ -302,10 +315,17 @@ app.get('/search', function(req, res){
   find_professor(req.query.name, req.query.course, function(data) {
     fs.readFile('result.html','utf8', function (err, page){
       res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
-      page = page.replace(/hour_result/g, data.toFixed(2))
-      page = page.replace(/grade_result/g, req.query.grade)
-      console.log("description "+description)
-      page = page.replace(/desc_result/g, description )
+      if(data < 0 || description.length < 0){
+        page = page.replace(/hour_result/g, "N/A")
+        page = page.replace(/grade_result/g, "N/A")
+        page = page.replace(/desc_result/g, "N/A")
+        page = page.replace(/Results/g, "There are no results to your search")
+      }
+      else{
+        page = page.replace(/hour_result/g, data.toFixed(2))
+        page = page.replace(/grade_result/g, req.query.grade)
+        page = page.replace(/desc_result/g, description )
+      }
       res.write(page);
       res.end();
     })
