@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		<title>Easy A: Home</title>
+		<title>Easy A: About</title>
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-        <link rel="stylesheet" type="text/css" href="main.css">
-
-    	<!-- Latest compiled and minified CSS -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<link rel="stylesheet" href="/main.css" crossorigin="anonymous">
 	</head>
 	<body>
-	
-	<nav class="navbar navbar-default">
+<nav class="navbar navbar-default">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -37,48 +34,41 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-		<div class="container">
-			<div class="jumbotron">
-				<h1>Easy A</h1>
-				<p>Check a course's workload and learn about a professor from aggregated ratings</p>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<h2>Input your Professor, Class, and Desired Grade.</h2>
+
+<div class="row">
+				<div class="col-md-4">
+					<img class="center-block" src="/CULogo-red120px.png">
+				</div>
+				<div class="col-md-4">
+					<img class="center-block" src="/mlh2.png">
+				</div>	
+				<div class="col-md-4">
+					<img class="center-block" src="/bigred2.png">
 				</div>
 			</div>
 			
-			<form action="/search">
-				<div class="form-group">
-					<label for="professorField">Professor</label>
-					<input type="text" class="form-control" name="name" id="professorField" placeholder="Professor">
+			<div class="row">
+				<div class="col-md-12">
 				</div>
-				<div class="form-group">
-					<label for="courseField">Course</label>
-					<input type="text" class="form-control" id="courseField" name="course" placeholder="Course (No Spaces)">
-				</div>
-				<div class="form-group">
-					<label for="gradeField">Desired Grade</label>
-					<select class="form-control" name="grade" id="gradeField">
-						<option>A</option>
-						<option>B</option>
-						<option>C</option>
-						<option>D</option>
-						<option>F</option>
-					</select>
-				</div>
-				<button type="submit" class="btn btn-primary">Submit</button>
-			</form>
+			</div>		
 
- <div class="row">
+		<div class="container">
+			<h1>The team: Aiden Cullo, Theodore Bauer, Robert Burton.</h1>
+			<h2></br><b>Robert Burton:</b> I do things. For reasons - with the goal of stuff.</h2>
+			<h2></br><b>Aiden Cullo:</b> Born too late to explore the earth and too early to explore the galaxy.</h2>
+			<h2></br><b>Ted Bauer:</b> You can observe a lot by just watching.</h2>
+
+		</div>
+		
+<div class="row">
 				<div class="col-md-4">
-					<img class="center-block" src="CULogo-red120px.png">
+					<img class="center-block" src="/CULogo-red120px.png">
 				</div>
 				<div class="col-md-4">
-					<img class="center-block" src="mlh2.png">
+					<img class="center-block" src="/mlh2.png">
 				</div>	
 				<div class="col-md-4">
-					<img class="center-block" src="bigred2.png">
+					<img class="center-block" src="/bigred2.png">
 				</div>
 			</div>
 			
@@ -86,9 +76,10 @@
 				<div class="col-md-12">
 					<p class="text-center">&copy easyA 2016</p>
 				</div>
-			</div> 
+			</div>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="app.js"></script>
 	</body>
 </html>

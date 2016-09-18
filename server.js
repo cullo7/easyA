@@ -181,6 +181,8 @@ function parseComment(comment){
     comment = removePeriods(comment)
     comment = removeCommonWords(comment.split(" "), common)
     comment.forEach(function(word){
+      console.log(word)
+      console.log(positive.indexOf("best"))
       if(positive.indexOf(word) > -1){
         console.log("positive "+word)
         effect *= 1.01
