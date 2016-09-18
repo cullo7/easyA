@@ -118,6 +118,8 @@ function paren(str){
 }
 
 function find_professor(name, course, cb){
+  console.log(name)
+  console.log(course)
   if (name === null) {
     console.log("No professor found.");
     return
@@ -171,7 +173,7 @@ function parseData(data, course){
 
   console.log(hours)
   // res.redirect('/results?hours='+hours)
-  return hours;
+  return hours/15;
 }
 
 function parseComment(comment){
@@ -180,9 +182,11 @@ function parseComment(comment){
     comment = removeCommonWords(comment.split(" "), common)
     comment.forEach(function(word){
       if(positive.indexOf(word) > -1){
+        console.log("positive "+word)
         effect *= 1.01
       }
       else if(negative.indexOf(word) > -1){
+        console.log("negative "+word)
         effect *=.99
       }
     })
@@ -208,10 +212,16 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 
 app.get('/search', function(req, res){
+  console.log(req.query.name+" "+req.query.course+" "+req.query.grade)
   find_professor(req.query.name, req.query.course, function(data) {
-    res.writeHeader(200, {"Content-Type": "text/html"});
-    res.write('<!DOCTYPE><html><body>'+data+'</body></html>');  
-    res.end(); 
+  fs.readFile('result.html','utf8', function (err, page){
+    res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
+    page = page.replace(/hour_result/g, data)
+    page = page.replace(/grade_result/g, req.query.grade)
+    page = page.replace(/desc_result/g, "Insert description" )
+    res.write(page);
+    res.end();
+  })
   })
 })
 
@@ -223,6 +233,6 @@ app.use('/', function(req, res) {
   })
 })
 
-app.listen('8080');
+app.listen('8020');
 
-/*****************************************************************************/
+/****************************************************************************/

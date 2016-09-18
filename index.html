@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>Easy A: Home</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <link rel="stylesheet" type="text/css" href="main.css">
+
+    	<!-- Latest compiled and minified CSS -->
+	</head>
+	<body>
+	
+	<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/result">Easy A</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+      	<li id="home-btn" class="active"><a href="/">Home<span class="sr-only">(current)</span></a></li>
+      	<li id="about-btn" ><a href="/about/index.php">About</a></li>
+      </ul>
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+		<div class="container">
+			<div class="jumbotron">
+				<h1>Easy A <i>for Cornell</i></h1>
+				<p>Check a course's workload and learn about a professor from aggregated ratings</p>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h2>Input your Professor, Class, and Desired Grade.</h2>
+				</div>
+			</div>
+			
+			<form action="/search">
+				<div class="form-group">
+					<label for="professorField">Professor</label>
+					<input type="text" class="form-control" name="name" id="professorField" placeholder="Professor">
+				</div>
+				<div class="form-group">
+					<label for="courseField">Course</label>
+					<input type="text" class="form-control" id="courseField" name="course" placeholder="Course (No Spaces)">
+				</div>
+				<div class="form-group">
+					<label for="gradeField">Desired Grade</label>
+					<select class="form-control" name="grade" id="gradeField">
+						<option>A</option>
+						<option>B</option>
+						<option>C</option>
+						<option>D</option>
+						<option>F</option>
+					</select>
+				</div>
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
+
+ <div class="row">
+				<div class="col-md-4">
+					<img class="center-block" src="CULogo-red120px.png">
+				</div>
+				<div class="col-md-4">
+					<img class="center-block" src="mlh2.png">
+				</div>	
+				<div class="col-md-4">
+					<img class="center-block" src="bigred2.png">
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-12">
+					<p class="text-center">&copy SchedulizeVR 2016</p>
+				</div>
+			</div> 
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</body>
+</html>
