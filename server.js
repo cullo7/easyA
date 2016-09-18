@@ -29,6 +29,29 @@ var weight = {
   comment:0
 }
 
+var bareTags = [
+  "TEST HEAVY",
+  "CLEAR GRADING CRITERIA",
+  "TOUGH GRADER",
+  "RESPECTED",
+  "LOTS OF HOMEWORK",
+  "LECTURE HEAVY",
+  "GET READY TO READ",
+  "CARING",
+  "GIVES GOOD FEEDBACK",
+  "PARTICIPATION MATTERS",
+  "SKIP CLASS? YOU WON'T PASS.",
+  "BEWARE OF POP QUIZZES",
+  "INSPIRATIONAL",
+  "ACCESSIBLE OUTSIDE OF CLASS",
+  "SO MANY PAPERS",
+  "HILARIOUS",
+  "GRADED BY FEW THINGS",
+  "AMAZING LECTURES",
+  "EXTRA CREDIT",
+  "GROUP PROJECTS"
+]
+
 var tags = {
   "TEST HEAVY": 1.05,
   "CLEAR GRADING CRITERIA":.95,
@@ -40,7 +63,7 @@ var tags = {
   "CARING":.95,
   "GIVES GOOD FEEDBACK":.95,
   "PARTICIPATION MATTERS":1,
-  "SKIP CLASS? YOU WON'T PASS": 1.05,
+  "SKIP CLASS? YOU WON'T PASS.": 1.05,
   "BEWARE OF POP QUIZZES":1,
   "INSPIRATIONAL": 1,
   "ACCESSIBLE OUTSIDE OF CLASS":1,
@@ -50,6 +73,52 @@ var tags = {
   "AMAZING LECTURES": 1,
   "EXTRA CREDIT": .95,
   "GROUP PROJECTS": 1
+}
+
+var tips = {
+  "TEST HEAVY": "Prepare to study for a lot of tests",
+  "CLEAR GRADING CRITERIA": "Adhere to outlined grading criteria",
+  "TOUGH GRADER": "Follow assignment instructions closely",
+  "RESPECTED":"Professor is Respected",
+  "LOTS OF HOMEWORK": "Make a routine for doing homework regularly",
+  "LECTURE HEAVY": "Lectures will be plentiful, takes notes",
+  "GET READY TO READ": "Prepare for a lot textbook reading",
+  "CARING": "Professor is Caring",
+  "GIVES GOOD FEEDBACK":"You will receive a lot of feedback on work",
+  "PARTICIPATION MATTERS": "Participate in class and discussions",
+  "SKIP CLASS? YOU WON'T PASS.": "Do not skip class",
+  "BEWARE OF POP QUIZZES":"Beware of pop quizzes",
+  "INSPIRATIONAL": "Professor is Inspirational",
+  "ACCESSIBLE OUTSIDE OF CLASS": "Professor is availablle outside of class",
+  "SO MANY PAPERS": "There will be a lot of papers",
+  "HILARIOUS":"Professor is Hilarious",
+  "GRADED BY FEW THINGS":"Grades are based off very few assignments",
+  "AMAZING LECTURES": "Lectures are amazing",
+  "EXTRA CREDIT": "Extra Credit is offered",
+  "GROUP PROJECTS": "There will be group projects"
+}
+
+var popular = {
+  "TEST HEAVY": 0,
+  "CLEAR GRADING CRITERIA":0,
+  "TOUGH GRADER":0,
+  "RESPECTED":0,
+  "LOTS OF HOMEWORK":0,
+  "LECTURE HEAVY": 0,
+  "GET READY TO READ": 0,
+  "CARING":0,
+  "GIVES GOOD FEEDBACK":0,
+  "PARTICIPATION MATTERS":0,
+  "SKIP CLASS? YOU WON'T PASS.": 0,
+  "BEWARE OF POP QUIZZES":0,
+  "INSPIRATIONAL": 0,
+  "ACCESSIBLE OUTSIDE OF CLASS":0,
+  "SO MANY PAPERS": 0,
+  "HILARIOUS":0,
+  "GRADED BY FEW THINGS":0,
+  "AMAZING LECTURES": 0,
+  "EXTRA CREDIT": 0,
+  "GROUP PROJECTS": 0
 }
 
 var ratings = {
@@ -64,6 +133,7 @@ var positive = []
 
 var negative = []
 
+var description = ""
 
 /****************************************/
 
@@ -83,7 +153,7 @@ streampos.pipe(posCSVStream);
 //stream in words with negative connotation
 var negCSVStream = csv()
     .on("data", function(data){
-        negative.push;
+        negative.push(data);
     })
     .on("end", function(){
          console.log("done");
@@ -135,6 +205,8 @@ function parseData(data, course){
   if(data.courses.indexOf(course) < 0){
     return -1;
   }
+  //description+=tips[data.topTag.split('(')[0].substring(0, 12).toUpperCase()]+"\n"
+
   hours = applyWeight(hours, tags[data.topTag.split('(')[0].substring(0, 12).toUpperCase()], .25)
   console.log(hours)
   hours = applyWeight(hours, (5-parseInt(data.quality,10))/3, weight.quality)
@@ -147,8 +219,14 @@ function parseData(data, course){
   console.log(hours)
   hours = applyWeight(hours, (10-parseInt(data.grade,10))/5, weight.grade)
 
-  console.log(hours)
   data.tags.forEach(function(tag){
+    console.log(tag)
+    popular[tag]++
+    /*if(tag.indexOf("'") > -1){
+      tag = "SKIP CLASS? YOU WON'T PASS."
+      console.log("changed "+ tags["SKIP CLASS? YOU WON'T PASS."])
+    }*/
+    console.log(tags[tag])
     hours = applyWeight(hours, tags[tag], weight.tag)
   })
 
@@ -162,17 +240,22 @@ function parseData(data, course){
   console.log(hours)
   data.courseRatings.forEach(function(rating){
     hours = applyWeight(hours, ratings[rating], weight.rating)
-    //console.log("hour"+hours+" rating "+rating)
   })
-  
+
+  for(var i = 0; i < 20; i++){
+    console.log("# "+popular[bareTags[i]])
+    if(popular[bareTags[i]] > 1){
+      description+="* "+tips[bareTags[i]]+"<br>"
+    }
+  }
+
   console.log(hours)
   data.comments.forEach(function(comment){
     hours = applyWeight(hours, parseComment(comment), weight.comment)
-    console.log("hours "+hours)
+    //console.log("hours "+hours)
   })
 
-  console.log(hours)
-  // res.redirect('/results?hours='+hours)
+  //console.log(hours)
   return hours/15;
 }
 
@@ -181,14 +264,14 @@ function parseComment(comment){
     comment = removePeriods(comment)
     comment = removeCommonWords(comment.split(" "), common)
     comment.forEach(function(word){
-      console.log(word)
-      console.log(positive.indexOf("best"))
+      //console.log(word)
+      //console.log(positive.indexOf("best"))
       if(positive.indexOf(word) > -1){
-        console.log("positive "+word)
+        //console.log("positive "+word)
         effect *= 1.01
       }
       else if(negative.indexOf(word) > -1){
-        console.log("negative "+word)
+        //console.log("negative "+word)
         effect *=.99
       }
     })
@@ -216,14 +299,15 @@ app.use(bodyparser.json());
 app.get('/search', function(req, res){
   console.log(req.query.name+" "+req.query.course+" "+req.query.grade)
   find_professor(req.query.name, req.query.course, function(data) {
-  fs.readFile('result.html','utf8', function (err, page){
-    res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
-    page = page.replace(/hour_result/g, data)
-    page = page.replace(/grade_result/g, req.query.grade)
-    page = page.replace(/desc_result/g, "Insert description" )
-    res.write(page);
-    res.end();
-  })
+    fs.readFile('result.html','utf8', function (err, page){
+      res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
+      page = page.replace(/hour_result/g, data)
+      page = page.replace(/grade_result/g, req.query.grade)
+      console.log("description "+description)
+      page = page.replace(/desc_result/g, description )
+      res.write(page);
+      res.end();
+    })
   })
 })
 
