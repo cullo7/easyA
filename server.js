@@ -18,14 +18,15 @@ var course = ""
 
 //0 - 1
 var weight = {
-  quality: .75,
-  easiness: 1,
-  help: 1,
-  clarity: 1,
-  topTag: .75,
-  grade: 1,
-  tag:.5,
-  rating:1
+  quality: .05,
+  easiness: .25,
+  help: .1,
+  clarity: .1,
+  topTag: .05,
+  grade: .25,
+  tag:.1,
+  rating:.1,
+  comment:0
 }
 
 var tags = {
@@ -128,33 +129,44 @@ function find_professor(name, course, cb){
 
 function parseData(data, course){
   var hours = 180
-  console.log(course)
+  console.log(hours)
   if(data.courses.indexOf(course) < 0){
     return -1;
   }
-  hours *= tags[data.topTag.split('(')[0].substring(0, 12).toUpperCase()]*5
-  hours *= ((5-parseInt(data.quality,10))/3)*weight.quality
-  hours *= ((5-parseInt(data.easiness,10))/3)*weight.easiness
-  hours *= ((5-parseInt(data.help,10))/3)*weight.help
-  hours *= ((parseInt(data.clarity,10))/3)*weight.clarity
-  hours *= ((10-parseInt(data.grade,10))/5)*weight.grade
+  hours = applyWeight(hours, tags[data.topTag.split('(')[0].substring(0, 12).toUpperCase()], .25)
+  console.log(hours)
+  hours = applyWeight(hours, (5-parseInt(data.quality,10))/3, weight.quality)
+  console.log(hours)
+  hours = applyWeight(hours, (5-parseInt(data.easiness,10))/3, weight.easiness)
+  console.log(hours)
+  hours = applyWeight(hours, (5-parseInt(data.help,10))/3, weight.help)
+  console.log(hours)
+  hours = applyWeight(hours, (5-parseInt(data.clarity,10))/3, weight.clarity)
+  console.log(hours)
+  hours = applyWeight(hours, (10-parseInt(data.grade,10))/5, weight.grade)
 
   console.log(hours)
   data.tags.forEach(function(tag){
-    hours *= (tags[tag]*weight.tag)
+    hours = applyWeight(hours, tags[tag], weight.tag)
   })
+
+  function applyWeight(total, grade, weight){
+    var rest = total - (total*weight)
+    var part = total*weight
+    var newPart = part*grade
+    return rest+newPart
+  }
 
   console.log(hours)
   data.courseRatings.forEach(function(rating){
-    hours *= (ratings[rating]*weight.rating)
+    hours = applyWeight(hours, ratings[rating], weight.rating)
     //console.log("hour"+hours+" rating "+rating)
   })
   
   console.log(hours)
   data.comments.forEach(function(comment){
-    console.log(comment)
-    hours *= (parseComment(comment)*weight.comment)
-    console.log(hours)
+    hours = applyWeight(hours, parseComment(comment), weight.comment)
+    console.log("hours "+hours)
   })
 
   console.log(hours)
@@ -165,11 +177,8 @@ function parseData(data, course){
 function parseComment(comment){
   var effect = 1.000;
     comment = removePeriods(comment)
-    console.log(comment.split(" "))
     comment = removeCommonWords(comment.split(" "), common)
-    console.log("\n\nchanged\n\n"+comment)
     comment.forEach(function(word){
-      console.log("word "+word)
       if(positive.indexOf(word) > -1){
         effect *= 1.01
       }
@@ -183,7 +192,7 @@ function parseComment(comment){
 function removePeriods(sentence){
   var postSentence = ""
   for(var i = 0; i < sentence.length; i++){
-    if(sentence[i] != '.' && sentence[i] != ','){
+    if(sentence[i] != '.' && sentence[i] != "!" && sentence[i] != ',' && i < sentence.length-1 && sentence.substring(i, i+2) !== ("  ")){
       postSentence+=sentence[i]
     }
   }
@@ -197,7 +206,6 @@ function removePeriods(sentence){
 app.use(express.static('public'));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
-app.set('view engine', 'jade')
 
 app.get('/search', function(req, res){
   find_professor(req.query.name, req.query.course, function(data) {
