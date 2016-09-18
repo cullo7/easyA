@@ -205,9 +205,10 @@ function parseData(data, course){
   if(data.courses.indexOf(course) < 0){
     return -1;
   }
-  //description+=tips[data.topTag.split('(')[0].substring(0, 12).toUpperCase()]+"\n"
+  var powerTag = data.topTag.split('(')[0]
+  powerTag = powerTag.substring(0,powerTag.length-1).toUpperCase()
 
-  hours = applyWeight(hours, tags[data.topTag.split('(')[0].substring(0, 12).toUpperCase()], .25)
+  hours = applyWeight(hours, tags[powerTag], .25)
   console.log(hours)
   hours = applyWeight(hours, (5-parseInt(data.quality,10))/3, weight.quality)
   console.log(hours)
@@ -301,7 +302,7 @@ app.get('/search', function(req, res){
   find_professor(req.query.name, req.query.course, function(data) {
     fs.readFile('result.html','utf8', function (err, page){
       res.writeHead(200, {'Content-Type': 'text/html','Content-Length':page.length});
-      page = page.replace(/hour_result/g, data)
+      page = page.replace(/hour_result/g, data.toFixed(2))
       page = page.replace(/grade_result/g, req.query.grade)
       console.log("description "+description)
       page = page.replace(/desc_result/g, description )

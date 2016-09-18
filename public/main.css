@@ -89,13 +89,10 @@ body{
 i{
   font-size:14px;
 }
-<<<<<<< HEAD
-
 #bacon {
 	background-image: url('/gates1.jpg');
 	background-size: cover;
-=======
+}
 #bullet{
   text-align:left;
->>>>>>> 24d169fd2635ec7828734ecb08149f4fce704436
 }
