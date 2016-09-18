@@ -16,42 +16,50 @@ var common = require('common-words');
 
 var course = ""
 
-//0 - 1 
+//0 - 1
 var weight = {
-	quality: .75,
+  quality: .75,
   easiness: 1,
   help: 1,
   clarity: 1,
   topTag: .75,
   grade: 1,
-	tag:.5,
-	rating:1
+  tag:.5,
+  rating:1
 }
 
-var tags{
-	"TEST HEAVY": 1.05,
-	 "CLEAR GRADING CRITERIA":.95,
-	 "TOUGH GRADER":1.1,
-	 "RESPECTED":.95,
-	 "LOTS OF HOMEWORK":1.1,
-	 "LECTURE HEAVY": 1,
-	 "GET READY TO READ": 1.05,
-	 "CARING":.95,
-	 "GIVES GOOD FEEDBACK":.95,
-		"PARTICIPATION MATTERS":1,
-		"SKIP CLASS? YOU WON'T PASS": 1.05,
-	"BEWARE OF POP QUIZZES":1,
-	"INSPIRATIONAL": 1,
-	"ACCESSIBLE OUTSIDE OF CLASS":1,
-	"SO MANY PAPERS": 1.05,
-	"HILARIOUS":1,
-	"GRADED BY FEW THINGS":1,
-	"AMAZING LECTURES": 1,
-	"EXTRA CREDIT": .95,
-	"GROUP PROJECTS": 1
+var tags = {
+  "TEST HEAVY": 1.05,
+  "CLEAR GRADING CRITERIA":.95,
+  "TOUGH GRADER":1.1,
+  "RESPECTED":.95,
+  "LOTS OF HOMEWORK":1.1,
+  "LECTURE HEAVY": 1,
+  "GET READY TO READ": 1.05,
+  "CARING":.95,
+  "GIVES GOOD FEEDBACK":.95,
+  "PARTICIPATION MATTERS":1,
+  "SKIP CLASS? YOU WON'T PASS": 1.05,
+  "BEWARE OF POP QUIZZES":1,
+  "INSPIRATIONAL": 1,
+  "ACCESSIBLE OUTSIDE OF CLASS":1,
+  "SO MANY PAPERS": 1.05,
+  "HILARIOUS":1,
+  "GRADED BY FEW THINGS":1,
+  "AMAZING LECTURES": 1,
+  "EXTRA CREDIT": .95,
+  "GROUP PROJECTS": 1
 }
 
-var postive = []
+var ratings = {
+  'AWESOME':.95,
+  'POOR':1.05,
+  'GOOD':.99,
+  'AVERAGE':1,
+  'AWFUL':1.1
+}
+
+var positive = []
 
 var negative = []
 
@@ -90,9 +98,8 @@ function removeCommonWords(words, common) {
       words.splice(words.indexOf(word), 1);
     }
   });
-  return words;
+  return words
 };
-removeCommonWords(yourWords, common);
 
 // Extracts string from inside next parenthesis it encounters
 function paren(str){
@@ -105,62 +112,82 @@ function paren(str){
         p = false
       else if (p)
         new_str+=str[i]
-    }
+   }
   return new_str
 }
 
-function find_professor(name, res){
-  if (professor === null) {
+function find_professor(name, course, cb){
+  if (name === null) {
     console.log("No professor found.");
-    return;
-  } 
-  rmp.get(name, parse_data)
-};
-
-function parse_data(data){
-	//16credits*3hours*15weeks
-	var hours = 180
-  if(data.courses.indexOf(course) < 0){
-		return -1;
-	}
-
-	hours *= tags[data.topTag.toUpperCase()]*5
-	hours *= ((5-parseInt(data.quality,10))/3)*weight.quality
-	hours *= ((5-parseInt(data.easiness,10))/3)*weight.easiness
-	hours *= ((5-parseInt(data.help,10))/3)*weight.help
-	hours *= ((parseInt(data.clarity,10))/3*)*weight.clarity
-	hours *= ((10-parseInt(data.grade,10))/5*)*weight.grade
-
-	for(tag in data.tags){
-		hours *= (tags[tag]*weight.tag)
-	}
-
-	for(rating in data.courseRatings){
-		hours *= (ratings[rating]*weight.rating)
-	}	
-
-	for(comment in data.comments{
-		hours *= (parseComment(comment)*weight.comment)
-	)
-
-	console.log(hours)
-	res.redirect('/results?hours='+hours)
+    return
+  }
+  rmp.get(name, function(data) {
+    cb(parseData(data, course));
+  })
 }
 
-function parseComments(comments){
-	var effect = 1.000;
-	for(comment in comments){
-		removeCommonWords(comment)
-		for(word in comment){
-			if(positive.indexOf(word) > -1){
-				effect *= 1..01
-			}
-			else if(negative.indexOf(word) > -1){
-				effect *=.99
-			}
-		}
-	}
-	return effect;
+function parseData(data, course){
+  var hours = 180
+  console.log(course)
+  if(data.courses.indexOf(course) < 0){
+    return -1;
+  }
+  hours *= tags[data.topTag.split('(')[0].substring(0, 12).toUpperCase()]*5
+  hours *= ((5-parseInt(data.quality,10))/3)*weight.quality
+  hours *= ((5-parseInt(data.easiness,10))/3)*weight.easiness
+  hours *= ((5-parseInt(data.help,10))/3)*weight.help
+  hours *= ((parseInt(data.clarity,10))/3)*weight.clarity
+  hours *= ((10-parseInt(data.grade,10))/5)*weight.grade
+
+  console.log(hours)
+  data.tags.forEach(function(tag){
+    hours *= (tags[tag]*weight.tag)
+  })
+
+  console.log(hours)
+  data.courseRatings.forEach(function(rating){
+    hours *= (ratings[rating]*weight.rating)
+    //console.log("hour"+hours+" rating "+rating)
+  })
+  
+  console.log(hours)
+  data.comments.forEach(function(comment){
+    console.log(comment)
+    hours *= (parseComment(comment)*weight.comment)
+    console.log(hours)
+  })
+
+  console.log(hours)
+  // res.redirect('/results?hours='+hours)
+  return hours;
+}
+
+function parseComment(comment){
+  var effect = 1.000;
+    comment = removePeriods(comment)
+    console.log(comment.split(" "))
+    comment = removeCommonWords(comment.split(" "), common)
+    console.log("\n\nchanged\n\n"+comment)
+    comment.forEach(function(word){
+      console.log("word "+word)
+      if(positive.indexOf(word) > -1){
+        effect *= 1.01
+      }
+      else if(negative.indexOf(word) > -1){
+        effect *=.99
+      }
+    })
+  return effect;
+}
+
+function removePeriods(sentence){
+  var postSentence = ""
+  for(var i = 0; i < sentence.length; i++){
+    if(sentence[i] != '.' && sentence[i] != ','){
+      postSentence+=sentence[i]
+    }
+  }
+  return postSentence
 }
 
 /*****************************************************************************/
@@ -170,10 +197,14 @@ function parseComments(comments){
 app.use(express.static('public'));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
+app.set('view engine', 'jade')
 
 app.get('/search', function(req, res){
-  course = req.query.course
-  find_professor(req.query.name, res)
+  find_professor(req.query.name, req.query.course, function(data) {
+    res.writeHeader(200, {"Content-Type": "text/html"});
+    res.write('<!DOCTYPE><html><body>'+data+'</body></html>');  
+    res.end(); 
+  })
 })
 
 app.use('/', function(req, res) {
@@ -184,12 +215,6 @@ app.use('/', function(req, res) {
   })
 })
 
-app.use('/results', function(req, res) {
-	res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
-  res.write(hours);
-  res.end();
-})
-
-app.listen('8080'); 
+app.listen('8080');
 
 /*****************************************************************************/
