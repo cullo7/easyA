@@ -8,6 +8,8 @@ var csv = require("fast-csv");
 var streampos = fs.createReadStream("positive.csv");
 var streamneg = fs.createReadStream("negative.csv");
 var common = require('common-words');
+var https = require('https');
+var request = require('request')
 
 
 
@@ -135,6 +137,8 @@ var negative = []
 
 var description = ""
 
+var courseDescription = -1
+
 /****************************************/
 
 
@@ -196,7 +200,7 @@ function find_professor(name, course, cb){
   for(var i = 0; i < course.length; i++){
 		if (course[i] < '0' || course[i] > '9') {
       console.log(course[i])
-    	course = course.substring(0, i)+course.charAt(i).toUpperCase()+course.substring(i+1)
+      course = course.substring(0, i)+course.charAt(i).toUpperCase()+course.substring(i+1)
 		} 
   }
 
@@ -279,9 +283,71 @@ function parseData(data, course){
     hours = applyWeight(hours, parseComment(comment), weight.comment)
     //console.log("hours "+hours)
   })
-
+ 
+  getDescription(course)
   //console.log(hours)
   return hours/15;
+}
+
+function getDescription(crs){
+	request('https://classes.cornell.edu/api/2.0/search/classes.json?roster=FA14&subject='+letters(crs)+'&acadCareer[]=UG&classLevels[]='+level(crs), function (error, response, body) {
+    console.log("\n\n\nhttps://classes.cornell.edu/api/2.0/search/classes.json?roster=FA14&subject="+letters(crs)+"&acadCareer[]=GR&classLevels[]="+level(crs)+"\n\n\n")
+		if (!error && response.statusCode == 200) {
+			var json = JSON.parse(body)
+			for(var i = 0; i < json.data.classes.length; i++){
+				if(json.data.classes[i].catalogNbr == numbers(crs)){
+          console.log("getting description "+json.data.classes[i].description)
+					courseDescription = json.data.classes[i].description
+				}
+			}
+		}
+	})  
+  return
+}
+
+function numbers(crs){
+	var ret = ""
+ for(var i = 0; i < crs.length; i++){
+		if (crs[i] >= '0' && crs[i] <= '9') {
+      console.log(crs[i])
+			ret+=crs[i]
+		} 
+  } 
+	return ret
+}
+
+function student(crs){
+  console.log(Number(numbers(crs)[0])+":"+Number('5'))
+  console.log("comparison "+Number(numbers(crs)[0]) < Number('5'))
+  if(Number(numbers(crs)[0]) < Number('5')){
+    return "UG"
+  }
+  else{
+    return "GR"
+  }
+}
+
+function letters(crs){
+	var ret = ""
+	for(var i = 0; i < crs.length; i++){
+		if (crs[i] < '0' || crs[i] > '9') {
+      console.log(crs[i])
+      ret+=crs[i]
+		} 
+  }
+  return ret
+}
+
+function level(crs){
+	var ret = ""
+ for(var i = 0; i < crs.length; i++){
+		if(crs[i] >= '0' && crs[i] <= '9') {
+      console.log("L"+crs[i])
+			ret+=crs[i]+'0'+'0'+'0'
+			break
+		} 
+  } 
+	return ret
 }
 
 function parseComment(comment){
@@ -323,7 +389,6 @@ app.use(bodyparser.json());
 
 app.get('/search', function(req, res){
   console.log(req.query.name+" "+req.query.course+" "+req.query.grade)
-
   find_professor(req.query.name, req.query.course, function(data) {
 
     fs.readFile('result.html','utf8', function (err, page){
@@ -340,6 +405,13 @@ app.get('/search', function(req, res){
         page = page.replace(/grade_result/g, req.query.grade)
         page = page.replace(/desc_result/g, description )
       }
+      if(courseDescription != -1){
+        page = page.replace(/course_description/g, courseDescription)
+      }
+      else{
+        page = page.replace(/course_description/g, "There is no available information on that course")
+      }
+      console.log("cd "+courseDescription)
       res.write(page);
       res.end();
     })
@@ -355,6 +427,6 @@ app.use('/', function(req, res) {
   })
 })
 
-app.listen('8020');
+app.listen('8030');
 
 /****************************************************************************/
