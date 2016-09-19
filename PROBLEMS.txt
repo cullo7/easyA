@@ -1,0 +1,7 @@
+- I'm pretty sure the algorithm that tests for words with positive connotation doesn't work
+- It queries too many descriptions
+- course description is lagging
+- url for cornell api isn't right
+Handle no name or course input
+-Returns a default econ description
+-can't resolve GR vs UG
